@@ -114,6 +114,10 @@ class _WebviewScaffoldState extends State<WebviewScaffold> {
     return topMost;
   }
 
+  void reloadUrl(String url) {
+    webviewReference.reloadUrl(url);
+  }
+
   @override
   void dispose() {
     super.dispose();

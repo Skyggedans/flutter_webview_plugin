@@ -44,7 +44,10 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+    useLibrary  'org.apache.http.legacy'
 }
 dependencies {
     implementation group: 'androidx.appcompat', name: 'appcompat', version: '1.0.0'
+//    implementation group: 'org.apache.httpcomponents', name: 'httpclient-android', version: '4.3.5.1'
+//    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11'
 }

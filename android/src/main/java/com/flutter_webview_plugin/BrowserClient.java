@@ -8,6 +8,16 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -87,6 +97,54 @@ public class BrowserClient extends WebViewClient {
 
         FlutterWebviewPlugin.channel.invokeMethod("onState", data);
         return isInvalid;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+        try {
+            //CloseableHttpClient client = HttpClientBuilder.create().build();
+            DefaultHttpClient client = new DefaultHttpClient();
+            HttpRequestBase httpRequest;
+
+            switch (request.getMethod()) {
+                case "POST": {
+                    httpRequest = new HttpPost(request.getUrl().toString());
+
+                    break;
+                }
+                default: {
+                    httpRequest = new HttpGet(request.getUrl().toString());
+                }
+            }
+
+            httpRequest.setHeader("header1", "header1_value");
+            httpRequest.setHeader("header2", "header2_value");
+            httpRequest.setHeader("header3", "header3_value");
+            httpRequest.setHeader("header4", "header4_value");
+
+            HttpResponse httpReponse = client.execute(httpRequest);
+            Header contentType = httpReponse.getEntity().getContentType();
+            Header encoding = httpReponse.getEntity().getContentEncoding();
+            InputStream responseInputStream = httpReponse.getEntity().getContent();
+
+            String contentTypeValue = null;
+            String encodingValue = null;
+
+            if (contentType != null) {
+                contentTypeValue = contentType.getValue();
+            }
+
+            if (encoding != null) {
+                encodingValue = encoding.getValue();
+            }
+
+            return new WebResourceResponse(contentTypeValue, encodingValue, responseInputStream);
+        } catch (ClientProtocolException e) {
+            return null;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
