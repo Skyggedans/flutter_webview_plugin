@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -330,6 +331,8 @@ class WebviewManager {
         webView.clearFormData();
     }
 
+    private Map<String, String> headers;
+
     void openUrl(
             boolean withJavascript,
             boolean clearCache,
@@ -404,6 +407,9 @@ class WebviewManager {
         }
 
         if (headers != null) {
+            Log.d("HEADERS", headers.toString());
+            this.headers = headers;
+            webViewClient.setHeaders(headers);
             webView.loadUrl(url, headers);
         } else {
             webView.loadUrl(url);
@@ -411,7 +417,8 @@ class WebviewManager {
     }
 
     void reloadUrl(String url) {
-        webView.loadUrl(url);
+        Log.d("HEADERS", headers.toString());
+        webView.loadUrl(url, headers);
     }
 
     void close(MethodCall call, MethodChannel.Result result) {

@@ -39,7 +39,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // NOTE(jeffmikels): When targetSdkVersion or minSdkVersion is not set or < 4, gradle adds 
         // additional scary permissions such as WRITE_EXTERNAL_STORAGE and READ_PHONE_STATE.
-        minSdkVersion 16
+        minSdkVersion 19
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -48,6 +48,7 @@ android {
 }
 dependencies {
     implementation group: 'androidx.appcompat', name: 'appcompat', version: '1.0.0'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.0.1'
 //    implementation group: 'org.apache.httpcomponents', name: 'httpclient-android', version: '4.3.5.1'
 //    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11'
 }

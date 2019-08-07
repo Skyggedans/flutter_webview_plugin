@@ -3,6 +3,7 @@ package com.flutter_webview_plugin;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -23,12 +24,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.CacheControl;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 /**
  * Created by lejard_h on 20/12/2017.
  */
 
 public class BrowserClient extends WebViewClient {
     private Pattern invalidUrlPattern = null;
+    private Map<String, String> headers = null;
 
     public BrowserClient() {
         this(null);
@@ -47,6 +55,10 @@ public class BrowserClient extends WebViewClient {
         } else {
             invalidUrlPattern = null;
         }
+    }
+
+    public void setHeaders(Map<String, String> value) {
+        headers = value;
     }
 
     @Override
@@ -83,6 +95,15 @@ public class BrowserClient extends WebViewClient {
         data.put("type", isInvalid ? "abortLoad" : "shouldStart");
 
         FlutterWebviewPlugin.channel.invokeMethod("onState", data);
+
+//        if (!isInvalid) {
+//            Log.d("URL", request.getUrl().toString());
+//
+//            view.loadUrl(request.getUrl().toString(), headers);
+//
+//            return true;
+//        }
+
         return isInvalid;
     }
 
@@ -99,54 +120,106 @@ public class BrowserClient extends WebViewClient {
         return isInvalid;
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        try {
-            //CloseableHttpClient client = HttpClientBuilder.create().build();
-            DefaultHttpClient client = new DefaultHttpClient();
-            HttpRequestBase httpRequest;
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//    @Override
+//    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+//        try {
+//            Log.d("URL", request.getUrl().toString());
+//
+//            final OkHttpClient client = new OkHttpClient().newBuilder()
+//                    .followRedirects(false)
+//                    .followSslRedirects(false)
+//                    .build();
+//
+//            final Call call = client.newCall(new Request.Builder()
+//                    .url(request.getUrl().toString())
+//                    .method(request.getMethod(), null)
+//                    .cacheControl(CacheControl.FORCE_NETWORK)
+//                    .build()
+//            );
+//
+//            final Response response = call.execute();
+//
+//            String contentType = response.header("content-type");
+//            String encoding = response.header("content-encoding");
+//            String contentTypeValue = null;
+//            String encodingValue = null;
+//
+//            if (contentType != null) {
+//                contentTypeValue = contentType;
+//            }
+//
+//            if (contentTypeValue != null && contentTypeValue.startsWith("text/html")) {
+//                //contentTypeValue = "text/html";
+//                encodingValue = "utf-8";
+//            }
+//
+//            if (encoding != null) {
+//                encodingValue = encoding;
+//            }
+//
+//            return new WebResourceResponse(contentTypeValue, encodingValue, response.body().byteStream());
+//        } catch (Exception e) {
+//            return null;
+//        }
+//
+////        Log.d("URL", request.getUrl().toString());
+////        return super.shouldInterceptRequest(view, request);
+//    }
 
-            switch (request.getMethod()) {
-                case "POST": {
-                    httpRequest = new HttpPost(request.getUrl().toString());
-
-                    break;
-                }
-                default: {
-                    httpRequest = new HttpGet(request.getUrl().toString());
-                }
-            }
-
-            httpRequest.setHeader("header1", "header1_value");
-            httpRequest.setHeader("header2", "header2_value");
-            httpRequest.setHeader("header3", "header3_value");
-            httpRequest.setHeader("header4", "header4_value");
-
-            HttpResponse httpReponse = client.execute(httpRequest);
-            Header contentType = httpReponse.getEntity().getContentType();
-            Header encoding = httpReponse.getEntity().getContentEncoding();
-            InputStream responseInputStream = httpReponse.getEntity().getContent();
-
-            String contentTypeValue = null;
-            String encodingValue = null;
-
-            if (contentType != null) {
-                contentTypeValue = contentType.getValue();
-            }
-
-            if (encoding != null) {
-                encodingValue = encoding.getValue();
-            }
-
-            return new WebResourceResponse(contentTypeValue, encodingValue, responseInputStream);
-        } catch (ClientProtocolException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//    @Override
+//    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+//        try {
+//            //CloseableHttpClient client = HttpClientBuilder.create().build();
+//            DefaultHttpClient client = new DefaultHttpClient();
+//            HttpRequestBase httpRequest;
+//
+//            switch (request.getMethod()) {
+//                case "POST": {
+//                    httpRequest = new HttpPost(request.getUrl().toString());
+//
+//                    break;
+//                }
+//                default: {
+//                    httpRequest = new HttpGet(request.getUrl().toString());
+//                }
+//            }
+//
+//            httpRequest.setHeader("header1", "header1_value");
+//            httpRequest.setHeader("header2", "header2_value");
+//            httpRequest.setHeader("header3", "header3_value");
+//            httpRequest.setHeader("header4", "header4_value");
+//
+//            HttpResponse httpReponse = client.execute(httpRequest);
+//            Header contentType = httpReponse.getEntity().getContentType();
+//            Header encoding = httpReponse.getEntity().getContentEncoding();
+//            InputStream responseInputStream = httpReponse.getEntity().getContent();
+//
+//            String contentTypeValue = null;
+//            String encodingValue = null;
+//
+//            if (contentType != null) {
+//                contentTypeValue = contentType.getValue();
+//            }
+//
+//            if (contentTypeValue != null && contentTypeValue.startsWith("text/html")) {
+//                contentTypeValue = "text/html";
+//                encodingValue = "utf-8";
+//            }
+//
+//            if (encoding != null) {
+//                encodingValue = encoding.getValue();
+//            }
+//
+//            return new WebResourceResponse(contentTypeValue, encodingValue, responseInputStream);
+//        } catch (ClientProtocolException e) {
+//            return null;
+//        } catch (IOException e) {
+//            return null;
+//        }
+//    }
+//
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
