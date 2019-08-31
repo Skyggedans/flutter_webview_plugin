@@ -96,13 +96,11 @@ public class BrowserClient extends WebViewClient {
 
         FlutterWebviewPlugin.channel.invokeMethod("onState", data);
 
-//        if (!isInvalid) {
-//            Log.d("URL", request.getUrl().toString());
-//
-//            view.loadUrl(request.getUrl().toString(), headers);
-//
-//            return true;
-//        }
+        if (!isInvalid) {
+            view.loadUrl(request.getUrl().toString(), headers);
+
+            return true;
+        }
 
         return isInvalid;
     }

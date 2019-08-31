@@ -407,7 +407,6 @@ class WebviewManager {
         }
 
         if (headers != null) {
-            Log.d("HEADERS", headers.toString());
             this.headers = headers;
             webViewClient.setHeaders(headers);
             webView.loadUrl(url, headers);
@@ -417,7 +416,6 @@ class WebviewManager {
     }
 
     void reloadUrl(String url) {
-        Log.d("HEADERS", headers.toString());
         webView.loadUrl(url, headers);
     }
 
